@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>Occupancy Prediction</title>
+    <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/loader.css' %}">
+</head>
+
+<body>
+    <nav class="light-blue lighten-1" role="navigation">
+        <ul class="right hide-on-med-and-down">
+            <li><a href="http://127.0.0.1:8000/rate">Rate Prediction</a></li>
+            <li><a href="/auth/logout">Logout</a></li>
+        </ul>
+        <ul id="nav-mobile" class="sidenav">
+            <li><a href="#">Navbar Link</a></li>
+        </ul>
+
+        <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </nav>
+    <div class="section no-pad-bot" id="index-banner">
+        <div class="container">
+            <!-- loader start -->
+            <div class="preloader" id="loader">
+                <svg viewBox="0 0 102 102" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="big-circle" d="M101 51C101 78.6142 78.6142 101 51 101C23.3858 101 1 78.6142 1 51" stroke="#252525" stroke-width="2"/>
+                    <path class="small-circle" d="M91 51C91 28.9086 73.0914 11 51 11C28.9086 11 11 28.9086 11 51" stroke="#252525" stroke-width="2"/>
+                </svg>
+            </div>
+            <!-- loader end -->
+            <div class="alert alert-danger" id="errorMsg" role="alert">
+                Date required!!
+            </div>
+            <br><br>
+            <h1 class="w-50 mx-auto">Occupancy and Revenue prediction</h1>
+            <div class="row center">
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <form class="col s12">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="w-50 mx-auto">
+                            <label for="date"><b>Date</b></label>
+                            <br>
+                            <input name="date" id="date" type="date" class="validate" style="width:600px">
+                        </div>
+                    </div>
+                    <div class="w-50 mx-auto">
+                        <button type="button" class="btn-large waves-effect waves-light orange" id="submitbtn" style="width:600px">Predict
+                            Probability</button>
+                    </div>
+                </form>
+
+            </div>
+            <br>
+            <h4>
+                <p class="w-50 mx-auto" id="pocc"></p>
+            </h4><br>
+
+            <h4>
+                <p class="w-50 mx-auto" id="prev"></p>
+            </h4>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/init.js' %}"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#errorMsg").hide();
+            $("#loader").hide();
+            $("#submitbtn").click(function () {
+                $.ajax({
+                    url: '/price_prediction',
+                    type: 'POST',
+                    headers: {
+                        "X-CSRFToken": '{{csrf_token}}'
+                    },
+                    data: {
+                        'date': $('#date').val(),
+                    },
+                    success: function (data) {
+                        console.log(data.status)
+                        if (data.status == 0) {
+                            $("#errorMsg").show();
+                        }
+                        else{
+                            $("#pocc").text("Predicted Occupancy : "+ data.data.predicted_occupancy);
+                            $("#prev").text("Predicted Revenue : $ "+ data.data.predicted_revenue);
+                            $("#errorMsg").hide();
+                        }
+                    },
+                });
+            });
+        });
+    </script>
+</body>

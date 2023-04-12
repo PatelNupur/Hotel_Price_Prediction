@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+      <title>Rate Prediction</title>
+      <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+      <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
+      <link rel="stylesheet" href="{% static 'css/loader.css' %}">
+   </head>
+   <body>
+      <nav class="light-blue lighten-1" role="navigation">
+         <ul class="right hide-on-med-and-down">
+            <li><a href="/">Occupancy Prediction</a></li>
+         </ul>
+         <ul id="nav-mobile" class="sidenav">
+            <li><a href="#">Navbar Link</a></li>
+         </ul>
+         <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+      </nav>
+      <br>
+      <br>
+      <div class="alert alert-danger" id="errorMsg" role="alert">
+      </div>
+      <div class="section no-pad-bot" id="index-banner">
+         <div class="container">
+            <br>
+            <br>
+            <h1 class="header center orange-text">Hotel Price Prediction</h1>
+            <div class="row center">
+            </div>
+            <br>
+            <br>
+            <div class="row">
+               <!--                <form class="col s12">-->
+               {% csrf_token %}
+               <div class="row">
+                  <div class="input-field col s4">
+                     <label for="date"><b>Date</b></label>
+                     <br>
+                     <input name="date" id="date" type="date" class="validate" required>
+                  </div>
+                  <div class="input-field col s4">
+                     <label for="length_of_stay"><b>Length of Stay </b></label>
+                     <br>
+                     <input id="length_of_stay" type="text" name="length_of_stay" placeholder="length of stay"
+                        class="validate" required>
+                  </div>
+                  <div class="input-field col s12">
+                     <select class="form-select" name="room_type" id="room_type">
+                        <option value="" disabled selected>Room Type</option>
+                        <option value="1">NHK</option>
+                        <option value="2">NHQQ</option>
+                        <option value="3">NK</option>
+                        <option value="4">NQQ</option>
+                        <option value="5">SNHK</option>
+                        <option value="6">SNK</option>
+                        <option value="7">SNQQ</option>
+                        <option value="8">SNQQ1</option>
+                     </select>
+                  </div>
+                  <div class="input-field col s4">
+                     <select class="form-select" name="track_code" id="track_code">
+                        <option value="" disabled selected>Track Code</option>
+                        <option value="1">Corporate</option>
+                        <option value="2">LEISURE</option>
+                        <option value="3">Meeting Room</option>
+                        <option value="4">Walk-In</option>
+                        <option value="5">Missing</option>
+                     </select>
+                  </div>
+                  <div class="input-field col s4">
+                     <select class="form-select" name="rate_code" id="rate_code">
+                        <option value="" disabled selected>Rate Code</option>
+                        <option value="1">BAR</option>
+                        <option value="2">Group</option>
+                        <option value="3">LBLREP</option>
+                        <option value="4">LCLC</option>
+                        <option value="5">LEXP</option>
+                        <option value="6">LOPQ</option>
+                        <option value="7">LOPQ2</option>
+                        <option value="8">LPSR</option>
+                        <option value="9">LPSS</option>
+                        <option value="10">S3A</option>
+                        <option value="11">SBOOK</option>
+                        <option value="12">SCPM</option>
+                        <option value="13">SGML</option>
+                        <option value="14">SNP</option>
+                        <option value="15">SRD Rate</option>
+                        <option value="16">SRTL</option>
+                        <option value="17">SSC</option>
+                     </select>
+                  </div>
+               </div>
+               <br>
+               <br>
+               <div class="row center">
+                  <button type="button" class="btn-large waves-effect waves-light orange" id="submitbtn">Predict
+                  Probability</button>
+               </div>
+               <section class="vh-100" id="dataSection">
+                  <div align="right" class="w-50">
+                     <h4 id="predSection">
+                        <p align="left" id="prerate"></p>
+                     </h4>
+                     <br>
+                     <h4 id="holySection">
+                        <p align="left">Holiday : <span id="holy"></span></p>
+                     </h4>
+                     <br>
+                     <div class="col-md-8 col-lg-6 col-xl-4" id="weatherSection">
+                        <h4>Forecasted Weather</h4>
+                        <div class="card" style="color: #4B515D;">
+                           <div class="card-body p-4">
+                              <div class="d-flex">
+                                 <h6 id="day"></h6>
+                              </div>
+                              <div class="d-flex flex-column text-center mt-5 mb-4">
+                                 <p class="display-4 mb-0 font-weight-bold" style="font-size:1.5em">Day</p>
+                                 <h6 class="display-4 mb-0 font-weight-bold" style="color: #1C2331;" id="temp"></h6>
+                                 <br>
+                                 <p class="display-4 mb-0 font-weight-bold" style="font-size:1.5em">Night</p>
+                                 <h6 class="display-4 mb-0 font-weight-bold" style="color: #1C2331;" id="night_temp"></h6>
+                                 <br>
+                                 <h5 class="small" style="color: #868B94" id="description">cloudy</h5>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </section>
+            </div>
+         </div>
+      </div>
+      <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script src="{% static 'js/materialize.js' %}"></script>
+      <script src="{% static 'js/init.js' %}"></script>
+      <script>
+         $(document).ready(function () {
+            $("#errorMsg").hide ();
+            $("#loader").hide();
+            $("#dataSection").hide();
+            $("#submitbtn").click(function () {
+                $.ajax({
+                    url: '/rate_prediction',
+                    type: 'POST',
+                    headers: {
+                        "X-CSRFToken": '{{csrf_token}}'
+                    },
+                    data: {
+                        'date': $('#date').val(),
+                        'length_of_stay': $('#length_of_stay').val(),
+                        'room_type': $('#room_type').val(),
+                        'track_code': $('#track_code').val(),
+                        'rate_code': $('#rate_code').val(),
+                    },
+                    success: function (data) {
+                        if (data.status == 0) {
+                            $("#errorMsg").text(data.message);
+                            $("#errorMsg").show();
+                        }
+                        else {
+                           if (data.data.holiday === undefined) {
+                              $("#holy").text("No event");
+                           }
+                           else {
+                              $("#holy").text(data.data.holiday);
+                           }
+                            try {
+                                $("#prerate").text("Predicted Rate : $" + data.data.predicted_rate.predicted_rate + "/night");
+                                $("#temp").text(data.data.weather_data.day_temperature);
+                                $("#night_temp").text(data.data.weather_data.night_temperature);
+                                $("#description").text(data.data.weather_data.description);
+                                $("#day").text(data.data.weather_data.day);
+                                $("#dt").text(data.data.weather_data.date);
+                                $("#errorMsg").hide();
+                                $("#dataSection").show();
+                                $("#weatherSection").show();
+                            } catch (error) {
+                                $("#prerate").text("Predicted Rate : $" + data.data.predicted_rate.predicted_rate + "/night");
+                                $("#errorMsg").hide();
+                                $("#weatherSection").hide();
+                                $("#dataSection").show();
+                            }
+                        }
+                    },
+                });
+            });
+        });
+    </script>
+</body>
+</html>
